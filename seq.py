@@ -69,14 +69,13 @@ def simulate_pendulum(theta_resolution, results_file_name, tmax, dt):
                                  'theta2_init': theta2_init,
                                  'theta1' : theta1[-1],
                                  'theta2' : theta2[-1],
-                                 'x1' : x1,
-                                 'x2' : x2,
-                                 'y1' : y1,
-                                 'y2' : y2})
+                                 'x1' : x1[-1],
+                                 'x2' : x2[-1],
+                                 'y1' : y1[-1],
+                                 'y2' : y2[-1]})
                 # print theta1_init, theta2_init, theta1[-1], theta2[-1]
 
 def main():
-    # DT ISTO KROZ ARG I IME FAJLA
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-r',
