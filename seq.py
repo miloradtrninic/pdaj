@@ -91,13 +91,13 @@ def main():
         default = 'results.csv'
     )
     parser.add_argument(
-        '-tmax',
+        '-t',
         '--timemax',
         type = float,
         default = 30.0
     )
     parser.add_argument(
-        '-dt',
+        '-d',
         '--dtime',
         type = float,
         default = 0.01
