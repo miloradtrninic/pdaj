@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import csv
 import argparse
-from itertools import imap
 import logging
+from multiprocessing import Pool
 from scipy.integrate import odeint
 
 
@@ -65,6 +65,8 @@ def simulate_pendulum(theta_resolution, results_file_name, tmax, dt):
     # Pendulum rod lengths (m), bob masses (kg).
     L1, L2 = 1.0, 1.0
     m1, m2 = 1.0, 1.0
+    pool = Pool()
+
 
     # Maximum time, time point spacings (all in s).
     with open(results_file_name, 'w') as resultsfile:
@@ -72,7 +74,7 @@ def simulate_pendulum(theta_resolution, results_file_name, tmax, dt):
         writer = csv.DictWriter(resultsfile, fieldnames=fieldnames)
         writer.writeheader()
         gen_values = generator(L1, L2, m1, m2, tmax, dt, theta_resolution)
-        results_iterator = imap(_worker, gen_values)
+        results_iterator = pool.imap(_worker, gen_values)
 
         for result in results_iterator:
             theta1, theta2, x1, y1, x2, y2, y0 = result
