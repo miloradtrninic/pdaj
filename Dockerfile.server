@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-MAINTAINER Petar Maric <petarmaric@uns.ac.rs>
+MAINTAINER Milorad Trninic <mile@mile.com>
 
 # Fix Docker-specific Ubuntu issues
 # (see https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/ for details)
@@ -8,15 +8,14 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV INITRD No
 
 # Update the Ubuntu package index and install the required Ubuntu packages
-RUN apt-get update -qq && apt-get install -y \
+RUN apt-get update && apt-get install -y \
   python-dev \
-  python-gmpy \
+  python-numpy \
   python-pip \
-  python-tables \
+  python-scipy \
   rabbitmq-server \
   redis-server \
-  supervisor \
-  > /dev/null
+  supervisor
 
 # Install the required Python packages
 # Celery has to be installed via pip, as Ubuntu distributes an older version which has a critical bug involving chords
@@ -35,9 +34,9 @@ ENV MONITORING_INTERVAL 30
 ENV MONITORING_METRIC_PREFIX experiments.export_beam_integrals
 
 # App specific configuration
-ENV_THETA_RESOLUTION 10
-ENV_TIME_MAX 30
-ENV_DTIME 0.1
+ENV THETA_RESOLUTION 10
+ENV TIME_MAX 30
+ENV DTIME 0.1
 
 # HDF5 storage configuration
 ENV HDF5_COMPLIB zlib
@@ -65,7 +64,7 @@ COPY docker/files/redis/redis.conf /etc/redis/redis.conf
 EXPOSE 5672 6379
 
 # Deploy the app
-COPY . /code/pdaj/
+COPY /pdaj_distr/ /code/pdaj/
 ENV PYTHONPATH /code
 
 # Configuration script (will be applied only if ENV 'DOCKER_CONFIGURE_SCRIPT' is set)

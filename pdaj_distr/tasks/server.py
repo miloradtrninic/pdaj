@@ -8,10 +8,9 @@ import csv
 from celery import chain, chord
 from celery.exceptions import Reject
 import numpy as np
-import tables as tb
 
 from ..app import app
-from .worker import simulate_pendulum
+from .worker import simulate_pendulum_instance
 
 
 ## Monitoring tasks
@@ -61,8 +60,8 @@ def record_experiment_status(status):
 
 @app.task
 def simulate_pendulum(ignore_result=True):
-    if os.path.exists(get_experiment_status_filename('started')):
-        raise Reject('Computations have already been seeded!')
+    #if os.path.exists(get_experiment_status_filename('started')):
+    #    raise Reject('Computations have already been seeded!')
 
     record_experiment_status.si('started').delay()
     L1, L2 = 1.0, 1.0
@@ -73,20 +72,35 @@ def simulate_pendulum(ignore_result=True):
     DTIME = app.conf.DTIME
 
     chord(
-        (simulate_pendulum(L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init)
-         for (L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init) in parametar_sweep(L1, L2, m1, m2, TIME_MAX, DTIME, THETA_RESOLUTION)),
+        (simulate_pendulum_instance.s(L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init)
+        for (L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init) in
+        parametar_sweep(L1, L2, m1, m2, TIME_MAX, DTIME, THETA_RESOLUTION)
+        ),
         save_pendulum_point.s()
     ).delay()
 
 def parametar_sweep(L1, L2, m1, m2, tmax, dt, theta_resolution):
     for theta1_init in np.linspace(0, 2 * np.pi, theta_resolution):
         for theta2_init in np.linspace(0, 2 * np.pi, theta_resolution):
-            return L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init
+            yield L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init
 
 
 ## Storing the computed integral tables
-
 @app.task
 def save_pendulum_point(results):
-    with open("results.csv", 'w') as resultsfile:
-        resultsfile.write(results)
+    filename = os.path.join(app.conf.RESULTS_DIR, 'results.csv')
+
+    with open(filename, 'w') as resultsfile:
+        fieldnames = ['theta1_init', 'theta2_init', 'theta1', 'theta2', 'x1', 'x2', 'y1', 'y2']
+        writer = csv.DictWriter(resultsfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for result in results:
+            theta1, theta2, x1, y1, x2, y2, y0 = result
+            writer.writerow({'theta1_init': y0[0],
+                             'theta2_init': y0[2],
+                             'theta1' : theta1[-1],
+                             'theta2' : theta2[-1],
+                             'x1' : x1[-1],
+                             'x2' : x2[-1],
+                             'y1' : y1[-1],
+                             'y2' : y2[-1]})
