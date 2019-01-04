@@ -45,6 +45,7 @@ def monitor_queues(ignore_result=True):
 def get_experiment_status_filename(status):
     return os.path.join(app.conf.STATUS_DIR, status)
 
+
 def get_experiment_status_time():
     """Get the current local date and time, in ISO 8601 format (microseconds and TZ removed)"""
     return datetime.now().replace(microsecond=0).isoformat()

@@ -3,9 +3,6 @@ import numpy as np
 from ..app import app
 
 
-SCALE_FACTOR_HELPER = 2.
-
-
 def solve(L1, L2, m1, m2, tmax, dt, y0):
     t = np.arange(0, tmax+dt, dt)
 
@@ -35,6 +32,8 @@ def deriv(y, t, L1, L2, m1, m2):
     z2dot = ((m1+m2)*(L1*z1**2*s - g*np.sin(theta2) + g*np.sin(theta1)*c) +
              m2*L2*z2**2*s*c) / L2 / (m1 + m2*s**2)
     return theta1dot, z1dot, theta2dot, z2dot
+
+
 @app.task
 def simulate_pendulum_instance(L1, L2, m1, m2, tmax, dt, theta1_init, theta2_init):
     y0 = np.array([

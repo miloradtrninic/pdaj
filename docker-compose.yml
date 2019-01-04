@@ -1,7 +1,7 @@
 worker:
   build: .
   dockerfile: Dockerfile.worker
-  hostname: worker
+  #hostname: worker
   environment:
     MAX_CPU_CORES: 1
   links:
@@ -15,7 +15,7 @@ server:
    - "5672:5672" # RabbitMQ
    - "6379:6379" # Redis
   environment:
-    THETA_RESOLUTION: 10
+    THETA_RESOLUTION: 30
     TIME_MAX: 10
     DTIME: 0.1
     MAX_CPU_CORES: 1

@@ -19,7 +19,7 @@ if AM_I_SERVER:
         MONITORING_SERVER_NAME = os.getenv('MONITORING_SERVER_NAME', 'localhost')
         MONITORING_SERVER_PORT = int(os.getenv('MONITORING_SERVER_PORT', 2003))
         MONITORING_INTERVAL = int(os.getenv('MONITORING_INTERVAL', 30))
-        MONITORING_METRIC_PREFIX = os.getenv('MONITORING_METRIC_PREFIX', 'experiments.export_beam_integrals')
+        MONITORING_METRIC_PREFIX = os.getenv('MONITORING_METRIC_PREFIX', 'experiments.pdaj')
 
     HDF5_COMPLIB = os.getenv('HDF5_COMPLIB', 'zlib')
     HDF5_COMPLEVEL = int(os.getenv('HDF5_COMPLEVEL', 1))
@@ -116,7 +116,7 @@ CELERYD_MAX_TASKS_PER_CHILD = 100
 if AM_I_SERVER and MONITORING_IS_ACTIVE:
     CELERYBEAT_SCHEDULE = {
         'monitor-queues': {
-            'task': 'export_beam_integrals.tasks.server.monitor_queues',
+            'task': 'pdaj.tasks.server.monitor_queues',
             'schedule': MONITORING_INTERVAL,
         },
     }
